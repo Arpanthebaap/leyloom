@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Leyloom: sward composition from quadrat photographs"
+type: software
+version: 0.2.0
+date-released: 2026-10-06
+license: MIT
+authors:
+  - family-names: "Ghosh"
+    given-names: "Arpan"
+repository-code: "https://github.com/Arpanthebaap/leyloom"
+keywords: [forage, leys, botanical composition, image analysis, grassland]
