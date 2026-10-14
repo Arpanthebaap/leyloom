@@ -90,9 +90,13 @@ labs = classify(arr)[:, 0].tolist()
 print(json.dumps(labs))
 `;
 
-const pythonBin = process.platform === 'win32'
+let pythonBin = process.platform === 'win32'
   ? path.join(rootDir, '.venv', 'Scripts', 'python.exe')
   : path.join(rootDir, '.venv', 'bin', 'python3');
+
+if (!fs.existsSync(pythonBin)) {
+  pythonBin = process.platform === 'win32' ? 'python' : 'python3';
+}
 
 const pyOutput = execFileSync(pythonBin, ['-c', pythonScript, JSON.stringify(pixels)], {
   cwd: rootDir,
