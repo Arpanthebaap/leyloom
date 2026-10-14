@@ -1,6 +1,9 @@
 # Leyloom: colour-based estimation of functional-group composition in grass-legume leys from quadrat photographs, with an open validation framework
 
-**Arpan Ghosh** (independent researcher, [Korvanta AI](https://korvanta-ai.vercel.app/)) · Version 0.3.0 · MIT licence  
+**Arpan Ghosh**  
+*Independent Researcher (Agribusiness & Applied AI Systems), Birbhum, West Bengal, India*  
+**Contact:** `arpanghosh984@gmail.com` | +91 77971 30249 | [GitHub Profile](https://github.com/Arpanthebaap)  
+Version 0.3.0 · MIT licence  
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23357579.svg)](https://doi.org/10.5281/zenodo.23357579)
 [![Tests](https://github.com/Arpanthebaap/leyloom/actions/workflows/tests.yml/badge.svg)](https://github.com/Arpanthebaap/leyloom/actions/workflows/tests.yml)
 [![Pages](https://github.com/Arpanthebaap/leyloom/actions/workflows/pages.yml/badge.svg)](https://github.com/Arpanthebaap/leyloom/actions/workflows/pages.yml)  
@@ -21,7 +24,9 @@ Species-rich and grass-legume leys are central to ruminant forage systems, and t
 
 ## System Architecture
 
-The following diagram illustrates the complete processing and evaluation workflow across both the offline client-side web application and the Python evaluation framework:
+![Leyloom Processing and Evaluation Pipeline](docs/assets/figure1_pipeline.png)
+
+The complete processing and evaluation workflow across both the offline client-side web application and the Python evaluation framework is structured as follows:
 
 ```mermaid
 flowchart TD
@@ -199,7 +204,22 @@ Evaluated on the **GrassClover biomass benchmark dataset** ($n = 261$ images; Sk
 
 *Calibrated parameters chosen on Nikon training images:* `hue_split = 90`, `min_green = 0.32`, `senescent = 0.20` (stored in `results/run.json`).
 
-### 5.2 What the Results Show (and Where the Tool Fails)
+### 5.2 Statistical Agreement Analysis (Bland–Altman Plots)
+
+![Bland-Altman Agreement Plots](docs/assets/figure2_bland_altman.png)
+*Figure 2. Bland–Altman agreement plots comparing Leyloom against reference biomass composition on held-out test images (Sony ILCE-7, n = 119). Top row (a–c): uncalibrated default thresholds; bottom row (d–f): calibrated thresholds (hue_split = 90°, min_green = 0.32, senescent = 0.20, fitted on Nikon D810A). Dashed black lines indicate mean bias; red dash-dotted lines denote 95% limits of agreement (±1.96 SD).*
+
+### 5.3 Predicted Cover vs. Reference Biomass Fractions
+
+![Predicted vs Reference Canopy Cover](docs/assets/figure3_predicted_vs_reference.png)
+*Figure 3. Scatter plots of predicted canopy cover versus reference biomass dry fraction for grass (a) and legume (b) on the held-out test set (n = 119). Red circular markers display predictions under uncalibrated default thresholds; coloured markers show predictions following site-level optical calibration. Dashed diagonal line indicates ideal 1:1 concordance.*
+
+### 5.4 Qualitative Sward Classification & Failure Case Overlays
+
+![Qualitative Classification Examples](docs/assets/figure4_classification_examples.png)
+*Figure 4. Qualitative pixel classification maps and overlays across representative swards. Left column: original nadir RGB images; middle column: Leyloom HSV pixel segmentation (green: grass, blue: legume, gold: senescent, grey: bare ground); right column: alpha-blended overlay showing reference dry biomass percentages versus Leyloom estimated canopy cover. Rows illustrate (a) an accurate high-clover canopy, (b) an accurate high-grass canopy, and (c) a dense multi-layered sward exhibiting vertical occlusion.*
+
+### 5.5 What the Results Show (and Where the Tool Fails)
 1. **Severe uncalibrated cross-camera bias:** With default thresholds, the model produces a systematic bias of +30.9% on grass and -28.4% on clover. Differences in camera colour rendering and default white-balance shift pixels across the hue boundary.
 2. **Calibration substantially reduces error and bias:** Tuning the three thresholds on the Nikon training images (`hue_split`: 90 vs 98 default; `min_green`: 0.32 vs 0.22 default) cuts MAE nearly in half (from 32.5% to 19.4% for grass, and 29.9% to 16.9% for legume) and drops bias to +7.2% and -4.7%. Concordance correlation (CCC) rises from ~0.11-0.16 to 0.36-0.47.
 3. **Where the tool is poor:**
