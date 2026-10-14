@@ -8,3 +8,5 @@ data/real/
 results/
 .venv/
 local_notes/
+*.docx
+*.doc
