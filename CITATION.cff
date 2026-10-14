@@ -4,6 +4,7 @@ title: "Leyloom: colour-based estimation of functional-group composition in gras
 type: software
 version: 0.3.0
 date-released: 2026-10-14
+doi: "10.5281/zenodo.23357579"
 license: MIT
 authors:
   - family-names: "Ghosh"

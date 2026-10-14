@@ -1,6 +1,7 @@
 # Leyloom: colour-based estimation of functional-group composition in grass-legume leys from quadrat photographs, with an open validation framework
 
-**Arpan Ghosh** (independent researcher, Korvanta AI) · Version 0.3.0 · MIT licence
+**Arpan Ghosh** (independent researcher, Korvanta AI) · Version 0.3.0 · MIT licence  
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23357579.svg)](https://doi.org/10.5281/zenodo.23357579)  
 Live tool: https://arpanthebaap.github.io/leyloom/ · Code: https://github.com/Arpanthebaap/leyloom
 
 > **Status.** The software is complete and unit-tested on synthetic data. **No field validation has been run yet, and no accuracy is claimed.** Section 5 is deliberately empty until the benchmark in `benchmark/` has been run on real reference data. This README follows the structure of a short paper so the study can be reviewed, reproduced and extended.
