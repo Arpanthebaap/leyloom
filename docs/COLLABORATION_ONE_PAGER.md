@@ -32,26 +32,6 @@ To validate the framework against realistic on-farm and plot-trial conditions, w
 - Complete data privacy: all raw data remains your property; public release of joint benchmarks occurs only with your explicit written approval.
 - Co-authorship on any resulting open-access methods or dataset publications.
 
----
+## Getting in Touch
+If you are running multi-species or grass-clover ley trials and would like to test your quadrat imagery with Leyloom, please open an issue or discussion on GitHub at [github.com/Arpanthebaap/leyloom/issues](https://github.com/Arpanthebaap/leyloom/issues).
 
-## Researcher Outreach Email Template (Draft — Do Not Send Automatically)
-
-**Subject:** Measuring grass-clover sward composition from quadrat photos: quick question on your trial data
-
-Dear Dr. [Researcher Surname],
-
-I have developed Leyloom (https://github.com/Arpanthebaap/leyloom, DOI: 10.5281/zenodo.23357579), an open, offline tool and calibration framework for estimating grass, legume, and forb fractions from top-down quadrat photographs.
-
-On the public GrassClover dataset, calibrating its simple colour rules against a held-out camera system achieved a mean absolute error of 16.9% for clover and 19.4% for grass against dry biomass (cutting uncalibrated error in half, though highlighting that non-flowering broadleaf weeds cannot be resolved by colour alone).
-
-I am currently seeking to benchmark this baseline against multi-species ley trial data with paired botanical separation or dual-observer visual estimates. 
-
-**Quick question:** In your recent ley trials, do you routinely collect top-down quadrat photos alongside your botanical hand-separations or visual scoring, and would you be open to running a test calibration on a small sample of your plots?
-
-Best regards,
-
-**Arpan Ghosh**  
-Independent Researcher  
-GitHub: https://github.com/Arpanthebaap  
-Repository: https://github.com/Arpanthebaap/leyloom  
-Live Tool: https://arpanthebaap.github.io/leyloom/
