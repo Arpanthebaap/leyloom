@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Leyloom: sward composition from quadrat photos</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9efe9;--ink:#14241a;--mut:#51635a;--card:#f8faf7;--line:#c5d2c8;--g:#6fae3c;--l:#1f7a5a;--f:#b4428c;--d:#c8a24a;--s:#7a5a3c;--ac:#14532d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1912;--ink:#e3eee6;--mut:#93a89b;--card:#16251b;--line:#2a3d2f;--ac:#8fd18c}}
+:root[data-theme="dark"]{--bg:#0f1912;--ink:#e3eee6;--mut:#93a89b;--card:#16251b;--line:#2a3d2f;--ac:#8fd18c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'Bricolage Grotesque',system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(2.4rem,8vw,4.2rem);font-weight:800;letter-spacing:-.03em;margin:.2em 0 0;line-height:1}
+h1 span{display:inline-block;background:linear-gradient(90deg,var(--g) 0 30%,var(--l) 30% 55%,var(--f) 55% 70%,var(--d) 70% 90%,var(--s) 90%);height:.16em;width:100%;margin-top:.1em;border-radius:2px}
+.sub{color:var(--mut);max-width:60ch;margin:.8em 0 1.4em}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+canvas{width:100%;height:auto;border-radius:6px;background:var(--line);display:block}
+label{display:block;font-size:.85rem;color:var(--mut);margin:.7em 0 .2em}
+input,select,button{font:inherit;color:var(--ink)}
+input[type=text],input[type=date],select{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+input[type=range]{width:100%;accent-color:var(--ac)}
+button{background:var(--ac);color:var(--bg);border:0;border-radius:6px;padding:9px 14px;cursor:pointer;font-weight:600}
+button.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--f);outline-offset:2px}
+.bar{display:flex;height:22px;border-radius:4px;overflow:hidden;margin:10px 0}
+.bar i{display:block}
+.leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.88rem}
+.leg b{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.tw{overflow-x:auto;margin-top:18px}
+table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:640px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+.note{font-size:.82rem;color:var(--mut);margin-top:22px;max-width:75ch}
+</style></head><body><main>
+<h1>Leyloom<span></span></h1>
+<p class="sub">Photograph a ley quadrat from above. Leyloom splits the canopy into grass, legume, forb, senescent and bare ground, then logs legume share and functional diversity for each plot and date. Tune the thresholds against your hand-sorted reference quadrats before trusting the numbers.</p>
+<div class="grid">
+<div class="box">
+<input type="file" id="f" accept="image/*" aria-label="Quadrat photo">
+<canvas id="c" width="400" height="300" aria-label="Quadrat photo with classification overlay"></canvas>
+<div class="row"><button class="alt" id="tg">Show overlay</button><button class="alt" id="demo">Try a synthetic demo</button></div>
+<label>Grass to legume hue split <output id="o1">98</output></label><input type="range" id="t1" min="75" max="140" value="98">
+<label>Minimum greenness <output id="o2">22</output></label><input type="range" id="t2" min="5" max="60" value="22">
+<label>Senescent sensitivity <output id="o3">30</output></label><input type="range" id="t3" min="10" max="60" value="30">
+</div>
+<div class="box">
+<div class="bar" id="bar" role="img" aria-label="Cover composition"></div>
+<div class="leg" id="leg"></div>
+<p id="m" style="margin:.8em 0 0"></p>
+<label for="pid">Plot ID</label><input type="text" id="pid" placeholder="e.g. Rob-B2-mix6">
+<label for="dt">Date</label><input type="date" id="dt">
+<label for="mx">Sward type</label><select id="mx"><option>Grass monoculture</option><option>Grass + clover</option><option>Species-rich ley</option><option>Farm field</option></select>
+<div class="row"><button id="add">Log quadrat</button></div>
+</div></div>
+<div class="tw"><table><thead><tr><th>Plot</th><th>Date</th><th>Type</th><th>Grass %</th><th>Legume %</th><th>Forb %</th><th>Senesc. %</th><th>Bare %</th><th>Legume share</th><th>Diversity H'</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="row"><button id="ex">Export CSV</button><button class="alt" id="cl">Clear log</button></div>
+<div class="box" style="margin-top:18px"><b>Validate against hand-sorted quadrats</b>
+<p class="sub" style="margin:.3em 0">For the photo currently loaded, enter the % cover you measured by hand (visual estimate or botanical separation), then save the pair. Leyloom reports its error against your reference.</p>
+<div class="grid" style="grid-template-columns:repeat(3,1fr)"><div><label for="rg">Grass % (reference)</label><input type="text" id="rg" inputmode="decimal"></div><div><label for="rl">Legume %</label><input type="text" id="rl" inputmode="decimal"></div><div><label for="rf">Forb %</label><input type="text" id="rf" inputmode="decimal"></div></div>
+<div class="row"><button id="vs">Save validation pair</button><button class="alt" id="vc">Clear pairs</button></div>
+<p id="vr" style="margin:.8em 0 0"></p></div>
+<p class="note">Method: each pixel is converted to hue, saturation and brightness, then assigned a group by rules (green hue below the split is grass, above it legume; bright white or saturated pink, purple or yellow pixels are flowers; yellow-brown is senescent; the rest is bare). H' is the Shannon index over grass, legume and forb cover. Classification uses colour (hue, saturation, brightness) only, so it separates functional groups, not species, and shadows, wet leaves and camera white balance shift results. Cover is a pixel share of the visible canopy, not biomass. Validate against botanical separation of the same quadrats and report the agreement. Data stays in this browser only; export CSV to keep it.</p>
+</main>
+<script>
+const COL={g:'#6fae3c',l:'#1f7a5a',f:'#b4428c',d:'#c8a24a',s:'#7a5a3c'};
+const NM={g:'Grass',l:'Legume',f:'Forb (flowers)',d:'Senescent',s:'Bare'};
+const $=id=>document.getElementById(id),cv=$('c'),cx=cv.getContext('2d',{willReadFrequently:true});
+let img=null,mask=null,res=null,show=true,rows=[];
+const KEY='leyloom-log';
+try{rows=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){rows=[]}
+$('dt').valueAsDate=new Date();
+function hsv(r,g,b){r/=255;g/=255;b/=255;const m=Math.max(r,g,b),n=Math.min(r,g,b),d=m-n;let h=0;
+if(d){if(m==r)h=((g-b)/d)%6;else if(m==g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;if(h<0)h+=360}
+return[h,m?d/m:0,m]}
+function analyse(){
+if(!img)return;
+const W=400,H=Math.round(img.height*W/img.width);cv.width=W;cv.height=H;
+cx.drawImage(img,0,0,W,H);
+const px=cx.getImageData(0,0,W,H),dt=px.data,sp=+$('t1').value,gm=+$('t2').value/100,sn=+$('t3').value/100;
+const cnt={g:0,l:0,f:0,d:0,s:0};mask=new Uint8Array(W*H);const keys=['g','l','f','d','s'];
+for(let i=0,p=0;i<dt.length;i+=4,p++){
+const[h,s,v]=hsv(dt[i],dt[i+1],dt[i+2]);let k;
+if(v>.82&&s<.14)k='f';
+else if(s>.4&&v>.5&&(h>=270&&h<=345||h<=12))k='f';
+else if(s>.7&&v>.75&&h>=46&&h<=64)k='f';
+else if(h>=65&&h<=170&&s>=gm&&v>.12)k=h<sp?'g':'l';
+else if(h>=28&&h<=65&&s>=sn&&v>.3)k='d';
+else k='s';
+cnt[k]++;mask[p]=keys.indexOf(k)}
+const T=W*H;res={};keys.forEach(k=>res[k]=100*cnt[k]/T);
+draw(px,W,H);render()}
+function draw(px,W,H){
+cx.putImageData(px,0,0);
+if(!show)return;
+const o=cx.getImageData(0,0,W,H),d=o.data,rgb=[[111,174,60],[31,122,90],[180,66,140],[200,162,74],[122,90,60]];
+for(let p=0;p<mask.length;p++){const c=rgb[mask[p]],i=p*4;d[i]=d[i]*.4+c[0]*.6;d[i+1]=d[i+1]*.4+c[1]*.6;d[i+2]=d[i+2]*.4+c[2]*.6}
+cx.putImageData(o,0,0)}
+function div(r){const v=[r.g,r.l,r.f].map(x=>x/100),t=v.reduce((a,b)=>a+b,0);if(!t)return 0;
+return -v.map(x=>x/t).filter(x=>x>0).reduce((a,x)=>a+x*Math.log(x),0)}
+function share(r){const t=r.g+r.l+r.f;return t?100*r.l/t:0}
+function render(){
+if(!res)return;
+$('bar').innerHTML=Object.keys(COL).map(k=>`<i style="width:${res[k]}%;background:${COL[k]}"></i>`).join('');
+$('leg').innerHTML=Object.keys(COL).map(k=>`<span><b style="background:${COL[k]}"></b>${NM[k]} ${res[k].toFixed(1)}%</span>`).join('');
+$('m').textContent=`Legume share of green canopy ${share(res).toFixed(1)}%. Functional diversity H' ${div(res).toFixed(2)} (max 1.10).`}
+function table(){
+$('tb').innerHTML=rows.map((r,i)=>`<tr><td>${esc(r.p)}</td><td>${r.d}</td><td>${esc(r.t)}</td><td>${r.g}</td><td>${r.l}</td><td>${r.f}</td><td>${r.sd}</td><td>${r.s}</td><td>${r.sh}</td><td>${r.h}</td><td><button class="alt" data-i="${i}" aria-label="Delete row">x</button></td></tr>`).join('')||'<tr><td colspan="11">No quadrats logged yet. Load a photo, check the overlay, then log it.</td></tr>'}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(rows))}catch(e){}}
+$('f').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{img=im;analyse()};im.src=URL.createObjectURL(f)};
+['t1','t2','t3'].forEach((id,n)=>$(id).oninput=()=>{$('o'+(n+1)).textContent=$(id).value;analyse()});
+$('tg').onclick=()=>{show=!show;$('tg').textContent=show?'Show overlay':'Show photo';analyse()};
+$('add').onclick=()=>{if(!res){alert('Load a quadrat photo first.');return}
+rows.push({p:$('pid').value||'unnamed',d:$('dt').value,t:$('mx').value,g:res.g.toFixed(1),l:res.l.toFixed(1),f:res.f.toFixed(1),sd:res.d.toFixed(1),s:res.s.toFixed(1),sh:share(res).toFixed(1),h:div(res).toFixed(2)});save();table()};
+$('tb').onclick=e=>{const i=e.target.dataset.i;if(i!=null){rows.splice(+i,1);save();table()}};
+$('cl').onclick=()=>{if(confirm('Delete all logged quadrats?')){rows=[];save();table()}};
+$('ex').onclick=()=>{const h='plot,date,type,grass_pct,legume_pct,forb_pct,senescent_pct,bare_pct,legume_share_pct,shannon_H';
+const csv=[h,...rows.map(r=>[r.p,r.d,r.t,r.g,r.l,r.f,r.sd,r.s,r.sh,r.h].map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(','))].join('\n');
+const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='leyloom_quadrats.csv';a.click()};
+let vp=[];try{vp=JSON.parse(localStorage.getItem(KEY+'-val')||'[]')}catch(e){}
+function vrender(){const o=$('vr');if(!vp.length){o.textContent='No validation pairs yet. Aim for 30 or more quadrats across sward types and lighting.';return}
+const mae=k=>(vp.reduce((a,p)=>a+Math.abs(p.a[k]-p.r[k]),0)/vp.length).toFixed(1),bias=k=>(vp.reduce((a,p)=>a+p.a[k]-p.r[k],0)/vp.length).toFixed(1);
+o.textContent=`n = ${vp.length}. Mean absolute error (percentage points): grass ${mae('g')}, legume ${mae('l')}, forb ${mae('f')}. Bias: grass ${bias('g')}, legume ${bias('l')}, forb ${bias('f')}.`}
+$('vs').onclick=()=>{if(!res){alert('Load a photo first.');return}const r={g:parseFloat($('rg').value),l:parseFloat($('rl').value),f:parseFloat($('rf').value)};
+if([r.g,r.l,r.f].some(isNaN)){alert('Enter all three reference values as numbers.');return}
+vp.push({r,a:{g:res.g,l:res.l,f:res.f}});try{localStorage.setItem(KEY+'-val',JSON.stringify(vp))}catch(e){}vrender()};
+$('vc').onclick=()=>{vp=[];try{localStorage.removeItem(KEY+'-val')}catch(e){}vrender()};
+$('demo').onclick=()=>{const c=document.createElement('canvas');c.width=400;c.height=300;const x=c.getContext('2d'),R=Math.random;
+x.fillStyle='#6b4f33';x.fillRect(0,0,400,300);
+for(let i=0;i<2800;i++){const t=R();let col;
+if(t<.55)col=`hsl(${75+R()*18},${50+R()*25}%,${30+R()*20}%)`;
+else if(t<.85)col=`hsl(${125+R()*20},${40+R()*20}%,${18+R()*14}%)`;
+else if(t<.92)col=`hsl(${48+R()*10},45%,${45+R()*10}%)`;
+else col=R()<.5?'hsl(300,55%,60%)':'hsl(0,0%,95%)';
+x.strokeStyle=col;x.lineWidth=2+R()*4;x.beginPath();const a=R()*400,b=R()*300;x.moveTo(a,b);x.lineTo(a+(R()-.5)*30,b+(R()-.5)*30);x.stroke()}
+const im=new Image();im.onload=()=>{img=im;analyse()};im.src=c.toDataURL()};
+table();vrender();
+</script></body></html>

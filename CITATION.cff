@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Leyloom: colour-based estimation of functional-group composition in grass-legume leys from quadrat photographs"
+type: software
+version: 0.3.0
+date-released: 2026-10-14
+license: MIT
+authors:
+  - family-names: "Ghosh"
+    given-names: "Arpan"
+repository-code: "https://github.com/Arpanthebaap/leyloom"
+abstract: "Open offline tool and validation framework for estimating grass, legume, forb, senescent and bare-ground cover from quadrat photographs. Research prototype; field validation pending."
+keywords: [forage, leys, botanical composition, image analysis, grassland, validation]

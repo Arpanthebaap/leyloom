@@ -1,0 +1,18 @@
+[project]
+name = "leyloom"
+version = "0.3.0"
+description = "Colour-based sward composition from quadrat photographs, with a validation framework"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = ["numpy", "pandas", "pillow", "tabulate"]
+authors = [{ name = "Arpan Ghosh" }]
+[project.optional-dependencies]
+dev = ["pytest"]
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+[tool.setuptools.packages.find]
+where = ["src"]
+[tool.pytest.ini_options]
+pythonpath = ["src"]
